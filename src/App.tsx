@@ -9,6 +9,11 @@ import Dashboard from "./pages/Dashboard";
 import Payments from "./pages/Payments";
 import Reservations from "./pages/Reservations";
 import Visitors from "./pages/Visitors";
+import Announcements from "./pages/Announcements";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminBilling from "./pages/AdminBilling";
+import AdminMaintenance from "./pages/AdminMaintenance";
+import AdminVisits from "./pages/AdminVisits";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -16,6 +21,11 @@ const queryClient = new QueryClient();
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
+function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAdminAuthenticated } = useAuth();
+  return isAdminAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
 const App = () => (
@@ -58,6 +68,46 @@ const App = () => (
                 <ProtectedRoute>
                   <Visitors />
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/announcements"
+              element={
+                <ProtectedRoute>
+                  <Announcements />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <AdminProtectedRoute>
+                  <AdminDashboard />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/billing"
+              element={
+                <AdminProtectedRoute>
+                  <AdminBilling />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/maintenance"
+              element={
+                <AdminProtectedRoute>
+                  <AdminMaintenance />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/visits"
+              element={
+                <AdminProtectedRoute>
+                  <AdminVisits />
+                </AdminProtectedRoute>
               }
             />
             <Route path="*" element={<NotFound />} />

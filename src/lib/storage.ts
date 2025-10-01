@@ -4,6 +4,38 @@ export interface User {
   buildingNumber: string;
 }
 
+export interface AdminUser {
+  rut: string;
+  address: string;
+  password: string;
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  type: 'maintenance' | 'billing' | 'general';
+}
+
+export interface BillingStatement {
+  id: string;
+  month: string;
+  amount: number;
+  details: string;
+  createdDate: string;
+}
+
+export interface MaintenanceProject {
+  id: string;
+  projectName: string;
+  area: string;
+  estimatedDate: string;
+  budget: number;
+  description: string;
+  createdDate: string;
+}
+
 export interface Invoice {
   id: string;
   month: string;
@@ -31,9 +63,13 @@ export interface Visitor {
 
 const STORAGE_KEYS = {
   USER: 'app_user',
+  ADMIN_USER: 'app_admin_user',
   INVOICES: 'app_invoices',
   RESERVATIONS: 'app_reservations',
   VISITORS: 'app_visitors',
+  ANNOUNCEMENTS: 'app_announcements',
+  BILLING_STATEMENTS: 'app_billing_statements',
+  MAINTENANCE_PROJECTS: 'app_maintenance_projects',
 };
 
 export const storage = {
@@ -74,6 +110,45 @@ export const storage = {
   },
   setVisitors: (visitors: Visitor[]) => {
     localStorage.setItem(STORAGE_KEYS.VISITORS, JSON.stringify(visitors));
+  },
+
+  // Admin
+  getAdminUser: (): AdminUser | null => {
+    const data = localStorage.getItem(STORAGE_KEYS.ADMIN_USER);
+    return data ? JSON.parse(data) : null;
+  },
+  setAdminUser: (admin: AdminUser) => {
+    localStorage.setItem(STORAGE_KEYS.ADMIN_USER, JSON.stringify(admin));
+  },
+  clearAdminUser: () => {
+    localStorage.removeItem(STORAGE_KEYS.ADMIN_USER);
+  },
+
+  // Announcements
+  getAnnouncements: (): Announcement[] => {
+    const data = localStorage.getItem(STORAGE_KEYS.ANNOUNCEMENTS);
+    return data ? JSON.parse(data) : [];
+  },
+  setAnnouncements: (announcements: Announcement[]) => {
+    localStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify(announcements));
+  },
+
+  // Billing Statements
+  getBillingStatements: (): BillingStatement[] => {
+    const data = localStorage.getItem(STORAGE_KEYS.BILLING_STATEMENTS);
+    return data ? JSON.parse(data) : [];
+  },
+  setBillingStatements: (statements: BillingStatement[]) => {
+    localStorage.setItem(STORAGE_KEYS.BILLING_STATEMENTS, JSON.stringify(statements));
+  },
+
+  // Maintenance Projects
+  getMaintenanceProjects: (): MaintenanceProject[] => {
+    const data = localStorage.getItem(STORAGE_KEYS.MAINTENANCE_PROJECTS);
+    return data ? JSON.parse(data) : [];
+  },
+  setMaintenanceProjects: (projects: MaintenanceProject[]) => {
+    localStorage.setItem(STORAGE_KEYS.MAINTENANCE_PROJECTS, JSON.stringify(projects));
   },
 };
 

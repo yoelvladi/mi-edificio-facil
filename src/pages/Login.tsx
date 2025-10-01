@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2 } from 'lucide-react';
+import { Building2, Shield } from 'lucide-react';
+import AdminLogin from './AdminLogin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +14,7 @@ export default function Login() {
   const [rut, setRut] = useState('');
   const [address, setAddress] = useState('');
   const [buildingNumber, setBuildingNumber] = useState('');
+  const [adminDialogOpen, setAdminDialogOpen] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -54,6 +56,17 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-4 right-4"
+        onClick={() => setAdminDialogOpen(true)}
+      >
+        <Shield className="w-6 h-6" />
+      </Button>
+
+      <AdminLogin open={adminDialogOpen} onOpenChange={setAdminDialogOpen} />
+
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-4 text-center">
           <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
