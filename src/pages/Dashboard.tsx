@@ -95,8 +95,8 @@ export default function Dashboard() {
                   'bg-accent hover:bg-accent/90'
                 }`}>
                   <CardContent className="flex flex-col items-center justify-center p-8 gap-4">
-                    <div className="w-20 h-20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <module.icon className={`w-16 h-16 ${
+                    <div className="w-24 h-24 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <module.icon className={`w-20 h-20 ${
                         module.color === 'text-primary' ? 'text-primary-foreground' :
                         module.color === 'text-secondary' ? 'text-secondary-foreground' :
                         'text-accent-foreground'
