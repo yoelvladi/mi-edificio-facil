@@ -58,11 +58,11 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <Button
         variant="ghost"
-        size="icon"
         className="absolute top-4 right-4"
         onClick={() => setAdminDialogOpen(true)}
       >
-        <Shield className="w-6 h-6" />
+        <Shield className="w-7 h-7" />
+        <span className="text-base font-medium">Admin</span>
       </Button>
 
       <AdminLogin open={adminDialogOpen} onOpenChange={setAdminDialogOpen} />

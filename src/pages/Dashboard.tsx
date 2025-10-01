@@ -80,27 +80,45 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {modules.map((module) => (
-            <Button
-              key={module.path}
-              variant="outline"
-              className="h-auto p-0 overflow-hidden group"
-              onClick={() => navigate(module.path)}
-            >
-              <Card className="w-full border-0 shadow-none hover:shadow-lg transition-all">
-                <CardContent className="flex flex-col items-center justify-center p-8 gap-4">
-                  <div className={`w-20 h-20 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <module.icon className={`w-10 h-10 ${module.color}`} />
-                  </div>
-                  <div className="text-center space-y-1">
-                    <h3 className="font-semibold">{module.title}</h3>
-                    <p className="text-xs text-muted-foreground">{module.description}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Button>
-          ))}
+        <div className="flex justify-center">
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 max-w-4xl">
+            {modules.map((module) => (
+              <Button
+                key={module.path}
+                variant="outline"
+                className="h-auto p-0 overflow-hidden group border-0"
+                onClick={() => navigate(module.path)}
+              >
+                <Card className={`w-full border-0 shadow-lg hover:shadow-xl transition-all ${
+                  module.color === 'text-primary' ? 'bg-primary hover:bg-primary/90' :
+                  module.color === 'text-secondary' ? 'bg-secondary hover:bg-secondary/90' :
+                  'bg-accent hover:bg-accent/90'
+                }`}>
+                  <CardContent className="flex flex-col items-center justify-center p-8 gap-4">
+                    <div className="w-20 h-20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <module.icon className={`w-16 h-16 ${
+                        module.color === 'text-primary' ? 'text-primary-foreground' :
+                        module.color === 'text-secondary' ? 'text-secondary-foreground' :
+                        'text-accent-foreground'
+                      }`} />
+                    </div>
+                    <div className="text-center space-y-1">
+                      <h3 className={`font-semibold ${
+                        module.color === 'text-primary' ? 'text-primary-foreground' :
+                        module.color === 'text-secondary' ? 'text-secondary-foreground' :
+                        'text-accent-foreground'
+                      }`}>{module.title}</h3>
+                      <p className={`text-xs ${
+                        module.color === 'text-primary' ? 'text-primary-foreground/80' :
+                        module.color === 'text-secondary' ? 'text-secondary-foreground/80' :
+                        'text-accent-foreground/80'
+                      }`}>{module.description}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Button>
+            ))}
+          </div>
         </div>
       </main>
     </div>
