@@ -25,28 +25,28 @@ export default function Dashboard() {
       title: 'Pagar Gastos Comunes',
       description: 'Revisa y paga tus facturas mensuales',
       path: '/payments',
-      color: 'text-primary',
+      bgColor: 'bg-[#0A9C07]',
     },
     {
       icon: Calendar,
       title: 'Reservar Espacios',
       description: 'Reserva sala de eventos, piscina y terraza',
       path: '/reservations',
-      color: 'text-secondary',
+      bgColor: 'bg-[#264FEB]',
     },
     {
       icon: Users,
       title: 'Registrar Visitas',
       description: 'Registra y consulta tus visitas',
       path: '/visitors',
-      color: 'text-accent',
+      bgColor: 'bg-[#8C1A12]',
     },
     {
       icon: Bell,
       title: 'Anuncios',
       description: 'Ver comunicados de la administración',
       path: '/announcements',
-      color: 'text-primary',
+      bgColor: 'bg-[#C86909]',
     },
   ];
 
@@ -60,14 +60,14 @@ export default function Dashboard() {
             </div>
             <div>
               <h1 className="font-bold text-lg">Portal Comunitario</h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-m text-muted-foreground">
                 {user?.address} - {user?.buildingNumber}
               </p>
             </div>
           </div>
           <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Cerrar Sesión
+            <LogOut className="w-8 h-8 mr-2" />
+            <h3 className='font-bold text-lg' >Cerrar Sesión</h3>
           </Button>
         </div>
       </header>
@@ -89,28 +89,23 @@ export default function Dashboard() {
                 className="h-auto p-0 overflow-hidden group border-0"
                 onClick={() => navigate(module.path)}
               >
-                <Card className={`w-full border-0 shadow-lg hover:shadow-xl transition-all ${
-                  module.color === 'text-primary' ? 'bg-primary hover:bg-primary/90' :
-                  module.color === 'text-secondary' ? 'bg-secondary hover:bg-secondary/90' :
-                  'bg-accent hover:bg-accent/90'
-                }`}>
-                  <CardContent className="flex flex-col items-center justify-center p-8 gap-4">
-                    <div className="w-24 h-24 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <module.icon className={`w-20 h-20 ${
-                        module.color === 'text-primary' ? 'text-primary-foreground' :
-                        module.color === 'text-secondary' ? 'text-secondary-foreground' :
+                <Card className={`w-full border-0 shadow-lg hover:shadow-xl transition-all 
+                  ${module.bgColor} hover:brightness-95`}
+                >
+                  <CardContent className="flex flex-col items-center justify-center p-10 gap-8">
+                    <div className="w-72 h-30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <module.icon className={`!w-28 !h-28 ${
+
                         'text-accent-foreground'
                       }`} />
                     </div>
                     <div className="text-center space-y-1">
-                      <h3 className={`font-semibold ${
-                        module.color === 'text-primary' ? 'text-primary-foreground' :
-                        module.color === 'text-secondary' ? 'text-secondary-foreground' :
+                      <h3 className={`!text-2xl font-semibold ${
+
                         'text-accent-foreground'
                       }`}>{module.title}</h3>
-                      <p className={`text-xs ${
-                        module.color === 'text-primary' ? 'text-primary-foreground/80' :
-                        module.color === 'text-secondary' ? 'text-secondary-foreground/80' :
+                      <p className={`!text-l ${
+                  
                         'text-accent-foreground/80'
                       }`}>{module.description}</p>
                     </div>
