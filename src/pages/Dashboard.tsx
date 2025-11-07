@@ -74,9 +74,8 @@ export default function Dashboard() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Bienvenido</h2>
+          <h2 className="text-3xl font-bold mb-2"></h2>
           <p className="text-muted-foreground">
-            Selecciona una opción para continuar
           </p>
         </div>
 

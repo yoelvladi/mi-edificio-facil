@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar as CalendarIcon, Users, Waves, Home } from 'lucide-react';
+import { ArrowLeft, Users, Waves, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { storage, Reservation } from '@/lib/storage';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const SPACES = [
   { id: 'sala-eventos', name: 'Sala de Eventos', icon: Users, color: 'text-primary' },
@@ -28,37 +35,75 @@ export default function Reservations() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedSpace, setSelectedSpace] = useState<string>('sala-eventos');
 
+  
+  const [pendingReservation, setPendingReservation] = useState<Reservation | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [cancelId, setCancelId] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+
+ 
+  const formatDateLong = (dateString: string) => {
+    const date = new Date(dateString + 'T00:00:00');
+    return date.toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  };
+
   const handleReserve = (timeSlot: string) => {
     if (!selectedDate) return;
-
     const dateString = selectedDate.toISOString().split('T')[0];
+
     const newReservation: Reservation = {
       id: Date.now().toString(),
       space: selectedSpace as any,
       date: dateString,
       startTime: timeSlot,
-      endTime: `${parseInt(timeSlot.split(':')[0]) + 1}:00`,
+      endTime: `${parseInt(timeSlot.split(':')[0], 10) + 1}:00`,
     };
 
-    const updatedReservations = [...reservations, newReservation];
+    setPendingReservation(newReservation);
+    setShowConfirmModal(true);
+  };
+
+  const confirmReservation = () => {
+    if (!pendingReservation) return;
+    const updatedReservations = [...reservations, pendingReservation];
     setReservations(updatedReservations);
     storage.setReservations(updatedReservations);
+    setShowConfirmModal(false);
 
     toast({
-      title: 'Reserva exitosa',
-      description: `${SPACES.find(s => s.id === selectedSpace)?.name} reservado para ${timeSlot}`,
+      title: 'Reserva confirmada',
+      description: `Tu reserva para ${
+        SPACES.find((s) => s.id === pendingReservation.space)?.name
+      } el ${formatDateLong(pendingReservation.date)} a las ${
+        pendingReservation.startTime
+      } fue confirmada.`,
     });
+
+    setPendingReservation(null);
   };
 
   const handleCancelReservation = (id: string) => {
-    const updatedReservations = reservations.filter((r) => r.id !== id);
+    setCancelId(id);
+    setShowCancelModal(true);
+  };
+
+  const confirmCancel = () => {
+    if (!cancelId) return;
+    const updatedReservations = reservations.filter((r) => r.id !== cancelId);
     setReservations(updatedReservations);
     storage.setReservations(updatedReservations);
+    setShowCancelModal(false);
 
     toast({
-      title: 'Reserva cancelada',
-      description: 'La reserva ha sido cancelada exitosamente',
+      title: ' Reserva cancelada',
+      description: 'Tu reserva ha sido cancelada exitosamente.',
     });
+
+    setCancelId(null);
   };
 
   const isSlotAvailable = (timeSlot: string) => {
@@ -210,6 +255,47 @@ export default function Reservations() {
             </Card>
           </div>
         </div>
+
+        <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Confirmar reserva</DialogTitle>
+              <DialogDescription>
+                ¿Deseas confirmar tu reserva para{' '}
+                <strong>{SPACES.find((s) => s.id === pendingReservation?.space)?.name}</strong> el{' '}
+                <strong>
+                  {pendingReservation?.date ? formatDateLong(pendingReservation.date) : ''}
+                </strong>{' '}
+                a las <strong>{pendingReservation?.startTime}</strong>?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex gap-2">
+              <Button variant="outline" onClick={() => { setShowConfirmModal(false); setPendingReservation(null); }}>
+                Cancelar
+              </Button>
+              <Button onClick={confirmReservation}>Confirmar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>¿Estás seguro de cancelar?</DialogTitle>
+              <DialogDescription>
+                Esta acción eliminará tu reserva. ¿Deseas continuar?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex gap-2">
+              <Button variant="outline" onClick={() => { setShowCancelModal(false); setCancelId(null); }}>
+                No
+              </Button>
+              <Button variant="destructive" onClick={confirmCancel}>
+                Sí, cancelar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
