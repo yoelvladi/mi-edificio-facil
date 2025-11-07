@@ -32,24 +32,14 @@ export default function Reservations() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [reservations, setReservations] = useState<Reservation[]>(storage.getReservations());
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedSpace, setSelectedSpace] = useState<string>('sala-eventos');
 
-  
+  // Estados para modales
   const [pendingReservation, setPendingReservation] = useState<Reservation | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
-
- 
-  const formatDateLong = (dateString: string) => {
-    const date = new Date(dateString + 'T00:00:00');
-    return date.toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
 
   const handleReserve = (timeSlot: string) => {
     if (!selectedDate) return;
@@ -60,7 +50,7 @@ export default function Reservations() {
       space: selectedSpace as any,
       date: dateString,
       startTime: timeSlot,
-      endTime: `${parseInt(timeSlot.split(':')[0], 10) + 1}:00`,
+      endTime: `${parseInt(timeSlot.split(':')[0]) + 1}:00`,
     };
 
     setPendingReservation(newReservation);
@@ -74,13 +64,16 @@ export default function Reservations() {
     storage.setReservations(updatedReservations);
     setShowConfirmModal(false);
 
+    const fechaFormateada = new Date(pendingReservation.date + 'T00:00:00').toLocaleDateString('es-CL', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+
     toast({
       title: 'Reserva confirmada',
-      description: `Tu reserva para ${
-        SPACES.find((s) => s.id === pendingReservation.space)?.name
-      } el ${formatDateLong(pendingReservation.date)} a las ${
-        pendingReservation.startTime
-      } fue confirmada.`,
+      description: `${SPACES.find(s => s.id === pendingReservation.space)?.name} reservado para el ${fechaFormateada} a las ${pendingReservation.startTime}`,
     });
 
     setPendingReservation(null);
@@ -99,8 +92,8 @@ export default function Reservations() {
     setShowCancelModal(false);
 
     toast({
-      title: ' Reserva cancelada',
-      description: 'Tu reserva ha sido cancelada exitosamente.',
+      title: 'Reserva cancelada',
+      description: 'La reserva ha sido cancelada exitosamente',
     });
 
     setCancelId(null);
@@ -130,16 +123,18 @@ export default function Reservations() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
+      <main className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Reservar Espacios</h1>
           <p className="text-muted-foreground">
-            Reserva espacios comunitarios de forma sencilla
+            Selecciona un espacio, elige una fecha y selecciona una hora disponible
           </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
+
           <div className="space-y-6">
+
             <Card>
               <CardHeader>
                 <CardTitle>Seleccionar Espacio</CardTitle>
@@ -148,7 +143,7 @@ export default function Reservations() {
               <CardContent>
                 <Select value={selectedSpace} onValueChange={setSelectedSpace}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Selecciona un espacio" />
                   </SelectTrigger>
                   <SelectContent>
                     {SPACES.map((space) => (
@@ -164,54 +159,54 @@ export default function Reservations() {
               </CardContent>
             </Card>
 
+
             <Card>
               <CardHeader>
-                <CardTitle>Seleccionar Fecha</CardTitle>
+                <CardTitle>Seleccionar Fecha y Horario</CardTitle>
               </CardHeader>
-              <CardContent className="flex justify-center">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  className="rounded-md border"
-                />
+              <CardContent>
+                <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    className="rounded-md border"
+                  />
+
+                  {selectedDate && (
+                    <div className="flex-1 transition-all animate-fadeIn">
+                      <h3 className="text-lg font-semibold mb-3 text-center">
+                        {selectedDate.toLocaleDateString('es-CL', {
+                          weekday: 'long',
+                          day: 'numeric',
+                          month: 'long',
+                        })}
+                      </h3>
+                      <div className="grid grid-cols-3 gap-8">
+                        {TIME_SLOTS.map((slot) => {
+                          const available = isSlotAvailable(slot);
+                          return (
+                            <Button
+                              key={slot}
+                              variant={available ? 'outline' : 'secondary'}
+                              disabled={!available}
+                              onClick={() => handleReserve(slot)}
+                              className="w-full py-5 text-sm"
+                            >
+                              {slot}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
 
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Horarios Disponibles</CardTitle>
-                <CardDescription>
-                  {selectedDate?.toLocaleDateString('es-CL', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                  })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-2">
-                  {TIME_SLOTS.map((slot) => {
-                    const available = isSlotAvailable(slot);
-                    return (
-                      <Button
-                        key={slot}
-                        variant={available ? 'outline' : 'secondary'}
-                        disabled={!available}
-                        onClick={() => handleReserve(slot)}
-                        className="w-full"
-                      >
-                        {slot}
-                      </Button>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
             <Card>
               <CardHeader>
                 <CardTitle>Mis Reservas</CardTitle>
@@ -255,48 +250,55 @@ export default function Reservations() {
             </Card>
           </div>
         </div>
-
-        <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Confirmar reserva</DialogTitle>
-              <DialogDescription>
-                ¿Deseas confirmar tu reserva para{' '}
-                <strong>{SPACES.find((s) => s.id === pendingReservation?.space)?.name}</strong> el{' '}
-                <strong>
-                  {pendingReservation?.date ? formatDateLong(pendingReservation.date) : ''}
-                </strong>{' '}
-                a las <strong>{pendingReservation?.startTime}</strong>?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex gap-2">
-              <Button variant="outline" onClick={() => { setShowConfirmModal(false); setPendingReservation(null); }}>
-                Cancelar
-              </Button>
-              <Button onClick={confirmReservation}>Confirmar</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>¿Estás seguro de cancelar?</DialogTitle>
-              <DialogDescription>
-                Esta acción eliminará tu reserva. ¿Deseas continuar?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex gap-2">
-              <Button variant="outline" onClick={() => { setShowCancelModal(false); setCancelId(null); }}>
-                No
-              </Button>
-              <Button variant="destructive" onClick={confirmCancel}>
-                Sí, cancelar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </main>
+
+
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar reserva</DialogTitle>
+            <DialogDescription>
+              ¿Deseas confirmar tu reserva para{' '}
+              <strong>{SPACES.find(s => s.id === pendingReservation?.space)?.name}</strong> el{' '}
+              <strong>
+                {pendingReservation &&
+                  new Date(pendingReservation.date + 'T00:00:00').toLocaleDateString('es-CL', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+              </strong>{' '}
+              a las <strong>{pendingReservation?.startTime}</strong>?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={confirmReservation}>Confirmar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>¿Estás seguro de cancelar?</DialogTitle>
+            <DialogDescription>
+              Esta acción eliminará tu reserva. ¿Deseas continuar?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCancelModal(false)}>
+              No
+            </Button>
+            <Button variant="destructive" onClick={confirmCancel}>
+              Sí, cancelar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
