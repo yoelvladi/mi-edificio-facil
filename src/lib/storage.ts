@@ -16,6 +16,8 @@ export interface Announcement {
   description: string;
   date: string;
   type: 'maintenance' | 'billing' | 'general';
+  // If true, this announcement is highlighted for portal users
+  important?: boolean;
 }
 
 export interface BillingStatement {

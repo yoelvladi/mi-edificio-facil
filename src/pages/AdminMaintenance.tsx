@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Plus, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,7 @@ export default function AdminMaintenance() {
   const [estimatedDate, setEstimatedDate] = useState('');
   const [budget, setBudget] = useState('');
   const [description, setDescription] = useState('');
+  const [important, setImportant] = useState(false);
 
   const projects = storage.getMaintenanceProjects();
 
@@ -43,6 +44,7 @@ export default function AdminMaintenance() {
       description: `Se realizará mantenimiento en ${area}. Fecha estimada: ${estimatedDate}. Presupuesto: $${parseFloat(budget).toLocaleString('es-CL')}. ${description}`,
       date: new Date().toISOString(),
       type: 'maintenance',
+      important,
     };
 
     const announcements = storage.getAnnouncements();
@@ -58,6 +60,7 @@ export default function AdminMaintenance() {
     setEstimatedDate('');
     setBudget('');
     setDescription('');
+    setImportant(false);
   };
 
   return (
@@ -140,10 +143,21 @@ export default function AdminMaintenance() {
                   rows={4}
                 />
               </div>
-              <Button type="submit" className="w-full">
-                <Plus className="w-4 h-4 mr-2" />
-                Anunciar Mantenimiento
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant={important ? 'destructive' : 'outline'}
+                  className="flex-1"
+                  onClick={() => setImportant((v) => !v)}
+                >
+                  <Star className="w-4 h-4 mr-2" />
+                  {important ? 'Destacado: IMPORTANTE' : 'Marcar como importante'}
+                </Button>
+                <Button type="submit" className="flex-1">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Anunciar Mantenimiento
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>

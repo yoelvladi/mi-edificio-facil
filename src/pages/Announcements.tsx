@@ -7,9 +7,17 @@ import { storage } from '@/lib/storage';
 
 export default function Announcements() {
   const navigate = useNavigate();
-  const announcements = storage.getAnnouncements().sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const announcements = storage
+    .getAnnouncements()
+    .slice()
+    .sort((a, b) => {
+      // First, put important announcements first
+      const ai = a.important ? 1 : 0;
+      const bi = b.important ? 1 : 0;
+      if (bi - ai !== 0) return bi - ai;
+      // Then, by date desc
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -63,7 +71,7 @@ export default function Announcements() {
         ) : (
           <div className="space-y-4">
             {announcements.map((announcement) => (
-              <Card key={announcement.id}>
+              <Card key={announcement.id} className={announcement.important ? 'ring-2 ring-destructive/40' : ''}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -81,7 +89,12 @@ export default function Announcements() {
                         </CardDescription>
                       </div>
                     </div>
-                    <Badge variant="secondary">{getTypeLabel(announcement.type)}</Badge>
+                    <div className="flex items-center gap-2">
+                      {announcement.important && (
+                        <Badge variant="destructive">IMPORTANTE</Badge>
+                      )}
+                      <Badge variant="secondary">{getTypeLabel(announcement.type)}</Badge>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
