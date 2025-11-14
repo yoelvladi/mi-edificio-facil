@@ -71,15 +71,15 @@ export default function Announcements() {
         ) : (
           <div className="space-y-4">
             {announcements.map((announcement) => (
-              <Card key={announcement.id} className={announcement.important ? 'ring-2 ring-destructive/40' : ''}>
-                <CardHeader>
+              <Card key={announcement.id} className={`w-84 h-84 ${announcement.important ? 'ring-2 ring-destructive/40' : ''}`} >
+                <CardHeader className='w-30 h-30'>
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
                         {getIcon(announcement.type)}
                       </div>
                       <div>
-                        <CardTitle className="text-lg">{announcement.title}</CardTitle>
+                        <CardTitle className="text-xl">{announcement.title}</CardTitle>
                         <CardDescription>
                           {new Date(announcement.date).toLocaleDateString('es-CL', {
                             day: 'numeric',
@@ -98,7 +98,7 @@ export default function Announcements() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm">{announcement.description}</p>
+                  <p className="text-md">{announcement.description}</p>
                 </CardContent>
               </Card>
             ))}

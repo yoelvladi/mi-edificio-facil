@@ -16,6 +16,10 @@ export default function Visitors() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
+  const today = new Date().toISOString().split('T')[0];
+
+  const todaysVisitors = visitors.filter(visitor => visitor.entryDate === today);
+
   const handleRegisterVisitor = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -61,7 +65,7 @@ export default function Visitors() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-64 py-16 max-w-16xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Registrar Visitas</h1>
           <p className="text-muted-foreground">
@@ -117,17 +121,17 @@ export default function Visitors() {
                 Historial de Visitas
               </CardTitle>
               <CardDescription>
-                Visitas registradas anteriormente
+                Visitas registradas en el último dia
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {visitors.length === 0 ? (
+              {todaysVisitors.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
                   No hay visitas registradas
                 </p>
               ) : (
                 <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                  {visitors.map((visitor, index) => (
+                  {todaysVisitors.map((visitor, index) => (
                     <div key={visitor.id}>
                       {index > 0 && <Separator className="my-2" />}
                       <div className="py-2">
