@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { CreditCard, Calendar, Users, LogOut, Building2, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { storage } from '@/lib/storage';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -67,51 +68,51 @@ export default function Dashboard() {
           </div>
           <Button variant="outline" onClick={handleLogout}>
             <LogOut className="w-8 h-8 mr-2" />
-            <h3 className='font-bold text-lg' >Cerrar Sesión</h3>
+            <h3 className='font-bold text-lg'>Cerrar Sesión</h3>
           </Button>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2"></h2>
-          <p className="text-muted-foreground">
-          </p>
-        </div>
-
         <div className="flex justify-center">
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 max-w-4xl">
-            {modules.map((module) => (
-              <Button
-                key={module.path}
-                variant="outline"
-                className="h-auto p-0 overflow-hidden group border-0"
-                onClick={() => navigate(module.path)}
-              >
-                <Card className={`w-full border-0 shadow-lg hover:shadow-xl transition-all 
-                  ${module.bgColor} hover:brightness-95`}
+            {modules.map((module) => {
+              const unread = module.path === "/announcements" ? storage.countUnread() : 0;
+
+              return (
+                <Button
+                  key={module.path}
+                  variant="outline"
+                  className="relative h-auto p-0 overflow-hidden group border-0"
+                  onClick={() => navigate(module.path)}
                 >
-                  <CardContent className="flex flex-col items-center justify-center p-10 gap-8">
-                    <div className="w-72 h-30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <module.icon className={`!w-28 !h-28 ${
+                  {unread > 0 && (
+                    <span className="absolute top-2 right-2 bg-red-600 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center shadow-md border-2 border-white">
+                      {unread}
+                    </span>
+                  )}
 
-                        'text-accent-foreground'
-                      }`} />
-                    </div>
-                    <div className="text-center space-y-1">
-                      <h3 className={`!text-2xl font-semibold ${
-
-                        'text-accent-foreground'
-                      }`}>{module.title}</h3>
-                      <p className={`!text-l ${
-                  
-                        'text-accent-foreground/80'
-                      }`}>{module.description}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Button>
-            ))}
+                  <Card
+                    className={`w-full border-0 shadow-lg hover:shadow-xl transition-all 
+                    ${module.bgColor} hover:brightness-95`}
+                  >
+                    <CardContent className="flex flex-col items-center justify-center p-10 gap-8">
+                      <div className="w-72 h-30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <module.icon className="!w-28 !h-28 text-accent-foreground" />
+                      </div>
+                      <div className="text-center space-y-1">
+                        <h3 className="!text-2xl font-semibold text-accent-foreground">
+                          {module.title}
+                        </h3>
+                        <p className="!text-l text-accent-foreground/80">
+                          {module.description}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Button>
+              );
+            })}
           </div>
         </div>
       </main>

@@ -118,11 +118,8 @@ export default function Visitors() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-secondary" />
-                Historial de Visitas
+                Visitas de Hoy
               </CardTitle>
-              <CardDescription>
-                Visitas registradas en el último dia
-              </CardDescription>
             </CardHeader>
             <CardContent>
               {todaysVisitors.length === 0 ? (

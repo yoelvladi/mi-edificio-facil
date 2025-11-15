@@ -1,3 +1,5 @@
+import { read } from "fs";
+
 export interface User {
   rut: string;
   address: string;
@@ -18,6 +20,7 @@ export interface Announcement {
   type: 'maintenance' | 'billing' | 'general';
   // If true, this announcement is highlighted for portal users
   important?: boolean;
+  read?: boolean;
 }
 
 export interface BillingStatement {
@@ -129,12 +132,24 @@ export const storage = {
   // Announcements
   getAnnouncements: (): Announcement[] => {
     const data = localStorage.getItem(STORAGE_KEYS.ANNOUNCEMENTS);
-    return data ? JSON.parse(data) : [];
+    const list = data ? JSON.parse(data) : generateMockAnnouncements();
+
+    return list.map((a:Announcement) => ({
+      ...a,
+      read: a.read ?? false,
+    }));
   },
   setAnnouncements: (announcements: Announcement[]) => {
     localStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify(announcements));
   },
-
+  markAsRead: (id: string) => {
+    const list = storage.getAnnouncements();
+    const updated = list.map(a => a.id === id ? { ...a, read: true } : a);
+    storage.setAnnouncements(updated);
+  },
+  countUnread(){
+    return storage.getAnnouncements().filter(a => !a.read).length;
+  },
   // Billing Statements
   getBillingStatements: (): BillingStatement[] => {
     const data = localStorage.getItem(STORAGE_KEYS.BILLING_STATEMENTS);
@@ -153,7 +168,32 @@ export const storage = {
     localStorage.setItem(STORAGE_KEYS.MAINTENANCE_PROJECTS, JSON.stringify(projects));
   },
 };
-
+function generateMockAnnouncements(): Announcement[] {
+  return [
+    {
+      id: "a1",
+      title: "Corte de Agua Programado",
+      description: "El suministro de agua se suspenderá mañana de 10:00 a 13:00 por mantenimiento.",
+      date: new Date().toISOString(),
+      type: "maintenance",
+      important: true,
+    },
+    {
+      id: "a2",
+      title: "Pago de Gastos Comunes",
+      description: "Se recuerda a los residentes que el pago de gastos comunes vence el día 10 de cada mes.",
+      date: new Date("2025-11-01").toISOString(),
+      type: "billing",
+    },
+    {
+      id: "a3",
+      title: "Nueva Administración",
+      description: "Damos la bienvenida a la nueva administración del condominio.",
+      date: new Date("2025-11-12").toISOString(),
+      type: "general",
+    },
+  ];
+}
 function generateMockInvoices(): Invoice[] {
   const currentDate = new Date();
   const invoices: Invoice[] = [];
